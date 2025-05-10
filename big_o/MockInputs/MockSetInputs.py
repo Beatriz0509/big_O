@@ -1,0 +1,9 @@
+from src.services.BigO.MockInputs.MockDefaultInputSizes import MockDefaultInputSizes
+
+class MockSetInputs(MockDefaultInputSizes):
+
+    def __init__(self):
+        self.content = set()
+
+
+    

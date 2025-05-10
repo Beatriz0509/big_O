@@ -4,11 +4,16 @@ import numpy as np
 
 
 class NotFittedError(Exception):
+    """Exception raised when attempting to use a model that hasn't been fitted yet."""
     pass
 
 
 class ComplexityClass(object):
-    """ Abstract class that fits complexity classes to timing data.
+    """
+    Abstract base class for fitting complexity classes to timing data.
+
+    Concrete subclasses (e.g., Linear, Quadratic) implement the actual functional form.
+    Provides methods for fitting, evaluating, and comparing complexity models.
     """
 
     #: bool: _recalculate_fit_residuals controls if the residuals value
@@ -20,97 +25,117 @@ class ComplexityClass(object):
     _recalculate_fit_residuals = False
 
     def __init__(self):
-        # list of parameters of the fitted function class as returned by the
-        # last square method np.linalg.lstsq
+        # List of parameters of the fitted function as returned by
+        # the least square method np.linalg.lstsq
         self.coeff = None
 
     def fit(self, n, t):
-        """ Fit complexity class parameters to timing data.
+        """
+        Fit complexity class parameters to timing data.
 
-        Input:
-        ------
+        Parameters:
+        ----------
+        n : array-like
+            Input sizes for which timing data is measured.
+        t : array-like
+            Execution times corresponding to each n, in seconds.
 
-        n -- Array of values of N for which execution time has been measured.
-
-        t -- Array of execution times for each N in seconds.
-
-        Output:
+        Returns:
         -------
-
-        residuals -- Sum of square errors of fit
+        residuals : float
+            Sum of squared residuals of the fit.
         """
         n = np.asanyarray(n)
         t = np.asanyarray(t)
 
         x = self._transform_n(n)
         y = self._transform_time(t)
-        coeff, residuals, rank, s = np.linalg.lstsq(x, y, rcond=-1)
+        coeff, residuals, _, _ = np.linalg.lstsq(x, y, rcond=-1)
         self.coeff = coeff
 
-        # Check if residuals from least square can be used, or if it
-        # must be explicitly calculated.
         if self._recalculate_fit_residuals:
             ref_t = self.compute(n)
-            residuals = np.sum((ref_t - t) ** 2)
+            # SMAPE used to compute residuals when recalculating fit; 
+            # ensures scale-invariant error (0 to 1)
+            # https://en.wikipedia.org/wiki/Symmetric_mean_absolute_percentage_error
+            residuals = np.sqrt(np.sum(np.square(ref_t - t)))
         else:
             residuals = residuals[0]
         return residuals
 
     def compute(self, n):
-        """ Compute the value of the fitted function at `n`. """
+        """
+        Compute the fitted function value at given input size(s).
+
+        Parameters:
+        ----------
+        n : array-like
+            Input sizes to evaluate the fitted model on.
+
+        Returns:
+        -------
+        values : array-like
+            Computed/fitted times for each n.
+        """
         if self.coeff is None:
             raise NotFittedError()
 
         # Result is linear combination of the terms with the fitted
         # coefficients
         x = self._transform_n(n)
-        tot = 0
+        total = 0
         for i in range(len(self.coeff)):
-            tot += self.coeff[i] * x[:, i]
-        return self._inverse_transform_time(tot)
+            total += self.coeff[i] * x[:, i]
+        return self._inverse_transform_time(total)
 
     def coefficients(self):
-        """ Return coefficients in standard form. """
+        """Return the fitted model coefficients."""
         if self.coeff is None:
             raise NotFittedError()
         return self.coeff
 
     def __str__(self):
         prefix = '{}: '.format(self.__class__.__name__)
-
         if self.coeff is None:
             return prefix + 'not yet fitted'
-        return prefix + self.format_str().format(
-            *self.coefficients()) + ' (sec)'
+        return prefix + self.format_str().format(*self.coefficients()) + ' (sec)'
 
     # --- abstract methods
 
     @classmethod
     def format_str(cls):
-        """ Return a string describing the fitted function.
+        """
+        Return a string template describing the fitted function.
 
-        The string must contain one formatting argument for each coefficient.
+        Must include one formatting argument per coefficient.
         """
         return 'FORMAT STRING NOT DEFINED'
 
     def _transform_n(self, n):
-        """ Terms of the linear combination defining the complexity class.
+        """
+        Define the terms of the linear combination for the complexity class.
 
-        Output format: number of Ns x number of coefficients .
+        Output shape: (len(n), num_coefficients)
         """
         raise NotImplementedError()
 
     def _transform_time(self, t):
-        """ Transform time as needed for fitting.
-        (e.g., t->log(t)) for exponential class.
+        """
+        Optionally transform time for fitting.
+        E.g., t -> log(t) for exponential models.
         """
         return t
 
     def _inverse_transform_time(self, t):
-        """ Inverse transform time as needed for compute.
-        (e.g., t->exp(t)) for exponential class.
+        """
+        Reverse transformation applied to time.
+        E.g., t -> exp(t) for exponential models.
         """
         return t
+
+    # --- ordering support
+    # Compare complexity classes based on their 'order' attribute.
+    # Higher 'order' means higher computational complexity.
 
     def __gt__(self, other):
         return self.order > other.order
@@ -202,14 +227,16 @@ class Linearithmic(ComplexityClass):
 
 class Polynomial(ComplexityClass):
     order = 70
-
     _recalculate_fit_residuals = True
 
     def _transform_n(self, n):
         return np.vstack([np.ones(len(n)), np.log(n)]).T
 
-    def _transform_time(self, t):
-        return np.log(t)
+    def _transform_time(self, t: np.ndarray) -> np.ndarray:
+        t = np.asarray(t)  # Ensure it's a NumPy array
+        t[t <= 0] = np.nan  # Replace non-positive values with NaN
+        result = np.log(t)
+        return np.nan_to_num(result, nan=0.0)
 
     def _inverse_transform_time(self, t):
         return np.exp(t)
@@ -219,12 +246,11 @@ class Polynomial(ComplexityClass):
         return 'time = {:.2G} * x^{:.2G}'
 
     def coefficients(self):
-        """ Return coefficients in standard form. """
-        # The polynomial is stored in the format
-        # exp(a)*n^b where [a, b] are the coefficients
-        # Technical full format is exp(a+b*ln(n))
-        #
-        # Standard form is a*n^b
+        """
+        Return coefficients in standard form a * n^b.
+
+        Internal representation: exp(a) * n^b
+        """
         if self.coeff is None:
             raise NotFittedError()
 
@@ -234,14 +260,16 @@ class Polynomial(ComplexityClass):
 
 class Exponential(ComplexityClass):
     order = 80
-
     _recalculate_fit_residuals = True
 
     def _transform_n(self, n):
         return np.vstack([np.ones(len(n)), n]).T
 
-    def _transform_time(self, t):
-        return np.log(t)
+    def _transform_time(self, t: np.ndarray) -> np.ndarray:
+        t = np.asarray(t)  # Ensure it's a NumPy array
+        t[t <= 0] = np.nan  # Replace non-positive values with NaN
+        result = np.log(t)
+        return np.nan_to_num(result, nan=0.0)
 
     def _inverse_transform_time(self, t):
         return np.exp(t)
@@ -251,12 +279,11 @@ class Exponential(ComplexityClass):
         return 'time = {:.2G} * {:.2G}^n'
 
     def coefficients(self):
-        """ Return coefficients in standard form. """
-        # The polynomial is stored in the format
-        # exp(a)*exp(b)^n where [a, b] are the coefficients
-        # Technical full format is exp(a+b*n)
-        #
-        # Standard form is a*b^n
+        """
+        Return coefficients in standard form a * b^n.
+
+        Internal representation: exp(a + b*n)
+        """
         if self.coeff is None:
             raise NotFittedError()
 
@@ -264,6 +291,8 @@ class Exponential(ComplexityClass):
         return np.exp(a), np.exp(b)
 
 
-ALL_CLASSES = [Constant, Logarithmic, Linear, Linearithmic,
-               Quadratic, Cubic, Polynomial,
-               Exponential]
+# List of all complexity classes, ordered by expected growth
+ALL_CLASSES = [
+    Constant, Logarithmic, Linear, Linearithmic,
+    Quadratic, Cubic, Polynomial, Exponential
+]
