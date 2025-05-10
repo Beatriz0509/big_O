@@ -1,6 +1,6 @@
 import ast
-from src.services.BigO.DTOs.ArgumentDTO import ArgumentDTO
-from src.services.BigO.DTOs.TypeDTO import TypeDTO
+from DTOs.ArgumentDTO import ArgumentDTO
+from DTOs.TypeDTO import TypeDTO
 
 class Parser:
     """ 

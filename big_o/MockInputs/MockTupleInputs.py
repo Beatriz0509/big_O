@@ -1,4 +1,4 @@
-from src.services.BigO.MockInputs.MockDefaultInputSizes import MockDefaultInputSizes
+from MockInputs.MockDefaultInputSizes import MockDefaultInputSizes
 
 class MockTupleInputs(MockDefaultInputSizes):
 

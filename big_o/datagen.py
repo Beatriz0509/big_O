@@ -1,14 +1,14 @@
 import ast, random
-from src.services.BigO.MockInputs.MockBooleanInputs import MockBooleanInputs
-from src.services.BigO.MockInputs.MockDateTimeInputs import MockDateTimeInputs
-from src.services.BigO.MockInputs.MockDictInputs import MockDictInputs
-from src.services.BigO.MockInputs.MockFloatInputs import MockFloatInputs
-from src.services.BigO.MockInputs.MockIntegerInputs import MockIntegerInputs
-from src.services.BigO.MockInputs.MockListInputs import MockListInputs
-from src.services.BigO.MockInputs.MockSetInputs import MockSetInputs
-from src.services.BigO.MockInputs.MockStringInputs import MockStringInputs
-from src.services.BigO.MockInputs.MockTupleInputs import MockTupleInputs
-from src.services.BigO.DTOs.MockInputsDTO import MockInputsDTO
+from MockInputs.MockBooleanInputs import MockBooleanInputs
+from MockInputs.MockDateTimeInputs import MockDateTimeInputs
+from MockInputs.MockDictInputs import MockDictInputs
+from MockInputs.MockFloatInputs import MockFloatInputs
+from MockInputs.MockIntegerInputs import MockIntegerInputs
+from MockInputs.MockListInputs import MockListInputs
+from MockInputs.MockSetInputs import MockSetInputs
+from MockInputs.MockStringInputs import MockStringInputs
+from MockInputs.MockTupleInputs import MockTupleInputs
+from DTOs.MockInputsDTO import MockInputsDTO
 
 
 def get_mock_class(input_type):

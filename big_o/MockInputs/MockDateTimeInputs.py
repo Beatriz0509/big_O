@@ -1,6 +1,6 @@
 from datetime import datetime
 import random
-from src.services.BigO.MockInputs.MockDefaultInputSizes import MockDefaultInputSizes
+from MockInputs.MockDefaultInputSizes import MockDefaultInputSizes
 
 class MockDateTimeInputs(MockDefaultInputSizes):
 

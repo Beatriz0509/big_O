@@ -1,15 +1,15 @@
 from exectimeit import timeit
 import numpy as np, logging
-from src.services.BigO.complexities import ALL_CLASSES, Constant, Linear, Logarithmic
-from src.services.BigO.DTOs.TestDTO import TestDTO
-from src.services.BigO.DTOs.ComplexityDTO import ComplexityDTO
-from src.services.BigO.DTOs.ClassDTO import ClassDTO
-from src.services.BigO.DTOs.InputDTO import InputDTO
-from src.services.BigO.DTOs.OutputDTO import OutputDTO
-from src.services.BigO.DTOs.ResponseHealthDTO import ResponseHealthDTO
-from src.services.BigO.Parser import Parser
-from src.services.BigO.datagen import get_mock_data, get_input_sizes
-from src.services.BigO.MockInputs.MockInputs import MockInputs
+from complexities import ALL_CLASSES, Constant, Linear, Logarithmic
+from DTOs.TestDTO import TestDTO
+from DTOs.ComplexityDTO import ComplexityDTO
+from DTOs.ClassDTO import ClassDTO
+from DTOs.InputDTO import InputDTO
+from DTOs.OutputDTO import OutputDTO
+from DTOs.ResponseHealthDTO import ResponseHealthDTO
+from Parser import Parser
+from datagen import get_mock_data, get_input_sizes
+from MockInputs.MockInputs import MockInputs
 import sys, subprocess, pkg_resources
 from packaging import version
 

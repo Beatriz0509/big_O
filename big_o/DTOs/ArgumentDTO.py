@@ -1,5 +1,5 @@
-from src.services.BigO.DTOs.BaseDTO import BaseDTO
-from src.services.BigO.DTOs.TypeDTO import TypeDTO
+from DTOs.BaseDTO import BaseDTO
+from DTOs.TypeDTO import TypeDTO
 
 class ArgumentDTO(BaseDTO):
     name: str = ""

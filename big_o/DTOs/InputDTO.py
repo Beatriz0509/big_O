@@ -1,4 +1,4 @@
-from src.services.BigO.DTOs.BaseDTO import BaseDTO
+from DTOs.BaseDTO import BaseDTO
 
 class InputDTO(BaseDTO):
     value: str = ""

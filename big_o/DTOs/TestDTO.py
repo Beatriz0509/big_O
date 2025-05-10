@@ -1,6 +1,6 @@
-from src.services.BigO.DTOs.BaseDTO import BaseDTO
-from src.services.BigO.DTOs.InputDTO import InputDTO
-from src.services.BigO.DTOs.OutputDTO import OutputDTO
+from DTOs.BaseDTO import BaseDTO
+from DTOs.InputDTO import InputDTO
+from DTOs.OutputDTO import OutputDTO
 
 class TestDTO(BaseDTO):
     input: InputDTO = InputDTO()

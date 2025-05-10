@@ -1,5 +1,5 @@
-from src.services.BigO.DTOs.BaseDTO import BaseDTO
-from src.services.BigO.DTOs.ClassDTO import ClassDTO
+from DTOs.BaseDTO import BaseDTO
+from DTOs.ClassDTO import ClassDTO
 from typing import List
 
 class ComplexityDTO(BaseDTO):
