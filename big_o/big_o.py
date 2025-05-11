@@ -1,3 +1,5 @@
+# Modified by Tiago Fonseca (@tiagosf13), 2025
+
 from exectimeit import timeit
 import numpy as np, logging
 from complexities import ALL_CLASSES, Constant, Linear, Logarithmic

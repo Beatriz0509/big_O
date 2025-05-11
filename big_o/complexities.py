@@ -1,3 +1,5 @@
+# Modified by Tiago Fonseca (@tiagosf13), 2025
+
 """Definition of complexity classes."""
 
 import numpy as np

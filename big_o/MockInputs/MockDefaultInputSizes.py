@@ -1,3 +1,4 @@
+# Modified by Tiago Fonseca (@tiagosf13), 2025
 
 class MockDefaultInputSizes:
     min_n = 256

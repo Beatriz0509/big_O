@@ -1,3 +1,5 @@
+# Modified by Tiago Fonseca (@tiagosf13), 2025
+
 from DTOs.BaseDTO import BaseDTO
 from DTOs.InputDTO import InputDTO
 from DTOs.OutputDTO import OutputDTO

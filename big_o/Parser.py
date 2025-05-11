@@ -1,3 +1,5 @@
+# Modified by Tiago Fonseca (@tiagosf13), 2025
+
 import ast
 from DTOs.ArgumentDTO import ArgumentDTO
 from DTOs.TypeDTO import TypeDTO
